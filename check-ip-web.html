@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Checker</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(45deg, #ff0000, #ff7300, #ffeb00, #47ff00, #00ffcc, #2b65ff, #8000ff);
+            --glow-color: rgba(255, 255, 255, 0.5);
+            --bg-color: #0f0f11;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(41, 97, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 41, 112, 0.1) 0%, transparent 50%);
+        }
+
+        /* Hiệu ứng bông tuyết với CSS thuần túy */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 50% 50%, white 0%, transparent 0.5%),
+                radial-gradient(circle at 70% 30%, white 0%, transparent 0.5%),
+                radial-gradient(circle at 30% 70%, white 0%, transparent 0.5%),
+                radial-gradient(circle at 10% 20%, white 0%, transparent 0.5%),
+                radial-gradient(circle at 90% 80%, white 0%, transparent 0.5%);
+            background-size: 
+                20px 20px,
+                30px 30px,
+                25px 25px,
+                15px 15px,
+                35px 35px;
+            animation: snowfall 10s linear infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes snowfall {
+            0% {
+                background-position: 
+                    0px 0px,
+                    0px 0px,
+                    0px 0px,
+                    0px 0px,
+                    0px 0px;
+            }
+            100% {
+                background-position: 
+                    0px 1000px,
+                    100px 1000px,
+                    -100px 1000px,
+                    50px 1000px,
+                    -50px 1000px;
+            }
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px var(--card-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            margin: 20px 0;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+            }
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        
+        .check-btn {
+            position: relative;
+            display: block;
+            margin: 25px auto;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+            background: var(--primary-gradient);
+            background-size: 300%;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            animation: bgMove 8s linear infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .check-btn::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: inherit;
+            filter: blur(10px);
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        .check-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .check-btn:hover::after {
+            left: 100%;
+        }
+        
+        .check-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.4);
+        }
+        
+        .check-btn:active {
+            transform: translateY(2px);
+        }
+        
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .info-display {
+            margin-top: 25px;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .info-display.active {
+            opacity: 1;
+            height: auto;
+        }
+        
+        .info-display p {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .info-display p:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        strong {
+            color: #00ccff;
+            margin-right: 5px;
+        }
+        
+        /* Hiệu ứng ánh sáng nổi bật */
+        .container::after {
+            content: "";
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: lightMove 15s infinite alternate;
+            z-index: -1;
+        }
+        
+        @keyframes lightMove {
+            0% {
+                top: -100px;
+                left: -100px;
+            }
+            25% {
+                top: -100px;
+                left: calc(100% - 100px);
+            }
+            50% {
+                top: calc(100% - 100px);
+                left: calc(100% - 100px);
+            }
+            75% {
+                top: calc(100% - 100px);
+                left: -100px;
+            }
+            100% {
+                top: -100px;
+                left: -100px;
+            }
+        }
+        
+        /* Thiết kế đáp ứng */
+        @media (max-width: 600px) {
+            .container {
+                width: 100%;
+                padding: 20px;
+                margin-top: 10px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+            
+            input {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔍 Kiểm Tra IP 🔍</h2>
+        <input type="text" id="ipInput" placeholder="Nhập IP hoặc để trống để kiểm tra IP của bạn">
+        <div id="output" class="info-display"></div>
+        <button class="check-btn" onclick="checkIP()">Check IP</button>
+    </div>
+
+    <script>
+        function checkIP() {
+            let ip = document.getElementById("ipInput").value || ""; 
+            let apiURL = `http://ip-api.com/json/${ip}?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`;
+
+            fetch(apiURL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "fail") {
+                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.message}</p>`;
+                    } else {
+                        document.getElementById("output").innerHTML = `
+                            <p><strong>🌍 Châu lục:</strong> ${data.continent} (${data.continentCode})</p>
+                            <p><strong>🏳 Quốc gia:</strong> ${data.country} (${data.countryCode})</p>
+                            <p><strong>📍 Vùng:</strong> ${data.regionName} (${data.region})</p>
+                            <p><strong>🏙 Thành phố:</strong> ${data.city}</p>
+                            <p><strong>📮 Mã Zip:</strong> ${data.zip}</p>
+                            <p><strong>📡 ISP:</strong> ${data.isp}</p>
+                            <p><strong>🔗 Organization:</strong> ${data.org}</p>
+                            <p><strong>🖥 AS:</strong> ${data.as} (${data.asname})</p>
+                            <p><strong>🔍 Reverse DNS:</strong> ${data.reverse || "Không có"}</p>
+                            <p><strong>🕵 Proxy:</strong> ${data.proxy ? "Có" : "Không"}</p>
+                            <p><strong>🏢 Hosting:</strong> ${data.hosting ? "Có" : "Không"}</p>
+                            <p><strong>📱 Di động:</strong> ${data.mobile ? "Có" : "Không"}</p>
+                            <p><strong>🕰 Timezone:</strong> ${data.timezone} (UTC ${data.offset / 3600})</p>
+                            <p><strong>💰 Tiền tệ:</strong> ${data.currency}</p>
+                        `;
+                    }
+                    document.getElementById("output").classList.add("active");
+                })
+                .catch(error => {
+                    document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi khi lấy dữ liệu!</p>`;
+                    document.getElementById("output").classList.add("active");
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</body>
+</html>
