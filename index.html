@@ -278,6 +278,23 @@
             }
         }
         
+        /* Loading spinner */
+        .loading {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-gradient);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Thiết kế đáp ứng */
         @media (max-width: 600px) {
             .container {
@@ -300,15 +317,83 @@
     <div class="container">
         <h2>🔍 Kiểm Tra IP 🔍</h2>
         <input type="text" id="ipInput" placeholder="Nhập IP hoặc để trống để kiểm tra IP của bạn">
+        <div id="loading" class="loading"></div>
         <div id="output" class="info-display"></div>
         <button class="check-btn" onclick="checkIP()">Check IP</button>
     </div>
 
     <script>
         function checkIP() {
-            let ip = document.getElementById("ipInput").value || ""; 
+            let ip = document.getElementById("ipInput").value || "";
+            
+            // Hiển thị loading
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("output").classList.remove("active");
+            
+            // Sử dụng các CORS Proxy miễn phí
+            const corsProxies = [
+                "https://api.allorigins.win/raw?url=",
+                "https://cors-anywhere.herokuapp.com/",
+                "https://cors.bridged.cc/"
+            ];
+            
+            // Chọn một proxy ngẫu nhiên
+            const randomProxy = corsProxies[Math.floor(Math.random() * corsProxies.length)];
+            
+            // API endpoint
+            let originalApiURL = `http://ip-api.com/json/${ip}?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`;
+            
+            // Proxy URL
+            let apiURL = randomProxy + encodeURIComponent(originalApiURL);
+            
+            fetch(apiURL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Ẩn loading
+                    document.getElementById("loading").style.display = "none";
+                    
+                    if (data.status === "fail") {
+                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.message}</p>`;
+                    } else {
+                        document.getElementById("output").innerHTML = `
+                            <p><strong>🌍 Châu lục:</strong> ${data.continent || 'N/A'} (${data.continentCode || 'N/A'})</p>
+                            <p><strong>🏳 Quốc gia:</strong> ${data.country || 'N/A'} (${data.countryCode || 'N/A'})</p>
+                            <p><strong>📍 Vùng:</strong> ${data.regionName || 'N/A'} (${data.region || 'N/A'})</p>
+                            <p><strong>🏙 Thành phố:</strong> ${data.city || 'N/A'}</p>
+                            <p><strong>📮 Mã Zip:</strong> ${data.zip || 'N/A'}</p>
+                            <p><strong>📡 ISP:</strong> ${data.isp || 'N/A'}</p>
+                            <p><strong>🔗 Organization:</strong> ${data.org || 'N/A'}</p>
+                            <p><strong>🖥 AS:</strong> ${data.as || 'N/A'} (${data.asname || 'N/A'})</p>
+                            <p><strong>🔍 Reverse DNS:</strong> ${data.reverse || "Không có"}</p>
+                            <p><strong>🕵 Proxy:</strong> ${data.proxy ? "Có" : "Không"}</p>
+                            <p><strong>🏢 Hosting:</strong> ${data.hosting ? "Có" : "Không"}</p>
+                            <p><strong>📱 Di động:</strong> ${data.mobile ? "Có" : "Không"}</p>
+                            <p><strong>🕰 Timezone:</strong> ${data.timezone || 'N/A'} (UTC ${data.offset ? data.offset / 3600 : 'N/A'})</p>
+                            <p><strong>💰 Tiền tệ:</strong> ${data.currency || 'N/A'}</p>
+                        `;
+                    }
+                    document.getElementById("output").classList.add("active");
+                })
+                .catch(error => {
+                    // Ẩn loading
+                    document.getElementById("loading").style.display = "none";
+                    
+                    // Thử phương án dự phòng với ipapi.co (hỗ trợ HTTPS)
+                    fallbackToIpApi(ip);
+                    
+                    console.error("Error with CORS proxy:", error);
+                });
+        }
+        
+        // Hàm dự phòng khi CORS Proxy không hoạt động
+        function fallbackToIpApi(ip) {
             let apiURL = ip ? `https://ipapi.co/${ip}/json/` : 'https://ipapi.co/json/';
-
+            
             fetch(apiURL)
                 .then(response => response.json())
                 .then(data => {
@@ -334,9 +419,9 @@
                     document.getElementById("output").classList.add("active");
                 })
                 .catch(error => {
-                    document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi khi lấy dữ liệu!</p>`;
+                    document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi khi lấy dữ liệu! Vui lòng thử lại sau.</p>`;
                     document.getElementById("output").classList.add("active");
-                    console.error("Error:", error);
+                    console.error("Fallback error:", error);
                 });
         }
     </script>
