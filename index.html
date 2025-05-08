@@ -307,29 +307,28 @@
     <script>
         function checkIP() {
             let ip = document.getElementById("ipInput").value || ""; 
-            let apiURL = `http://ip-api.com/json/${ip}?fields=status,message,continent,continentCode,country,countryCode,region,regionName,city,zip,lat,lon,timezone,offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query`;
+            let apiURL = ip ? `https://ipapi.co/${ip}/json/` : 'https://ipapi.co/json/';
 
             fetch(apiURL)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === "fail") {
-                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.message}</p>`;
+                    if (data.error) {
+                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.reason || 'Không thể lấy thông tin IP'}</p>`;
                     } else {
                         document.getElementById("output").innerHTML = `
-                            <p><strong>🌍 Châu lục:</strong> ${data.continent} (${data.continentCode})</p>
-                            <p><strong>🏳 Quốc gia:</strong> ${data.country} (${data.countryCode})</p>
-                            <p><strong>📍 Vùng:</strong> ${data.regionName} (${data.region})</p>
-                            <p><strong>🏙 Thành phố:</strong> ${data.city}</p>
-                            <p><strong>📮 Mã Zip:</strong> ${data.zip}</p>
-                            <p><strong>📡 ISP:</strong> ${data.isp}</p>
-                            <p><strong>🔗 Organization:</strong> ${data.org}</p>
-                            <p><strong>🖥 AS:</strong> ${data.as} (${data.asname})</p>
-                            <p><strong>🔍 Reverse DNS:</strong> ${data.reverse || "Không có"}</p>
-                            <p><strong>🕵 Proxy:</strong> ${data.proxy ? "Có" : "Không"}</p>
-                            <p><strong>🏢 Hosting:</strong> ${data.hosting ? "Có" : "Không"}</p>
-                            <p><strong>📱 Di động:</strong> ${data.mobile ? "Có" : "Không"}</p>
-                            <p><strong>🕰 Timezone:</strong> ${data.timezone} (UTC ${data.offset / 3600})</p>
-                            <p><strong>💰 Tiền tệ:</strong> ${data.currency}</p>
+                            <p><strong>🌍 Châu lục:</strong> ${data.continent_code || 'N/A'}</p>
+                            <p><strong>🏳 Quốc gia:</strong> ${data.country_name || 'N/A'} (${data.country_code || 'N/A'})</p>
+                            <p><strong>📍 Vùng:</strong> ${data.region || 'N/A'}</p>
+                            <p><strong>🏙 Thành phố:</strong> ${data.city || 'N/A'}</p>
+                            <p><strong>📮 Mã Zip:</strong> ${data.postal || 'N/A'}</p>
+                            <p><strong>📡 ISP:</strong> ${data.org || 'N/A'}</p>
+                            <p><strong>🔗 ASN:</strong> ${data.asn || 'N/A'}</p>
+                            <p><strong>🕵 Latitude:</strong> ${data.latitude || 'N/A'}</p>
+                            <p><strong>🕵 Longitude:</strong> ${data.longitude || 'N/A'}</p>
+                            <p><strong>📱 IP:</strong> ${data.ip || 'N/A'}</p>
+                            <p><strong>🕰 Timezone:</strong> ${data.timezone || 'N/A'}</p>
+                            <p><strong>💰 Tiền tệ:</strong> ${data.currency || 'N/A'}</p>
+                            <p><strong>🔤 Languages:</strong> ${data.languages || 'N/A'}</p>
                         `;
                     }
                     document.getElementById("output").classList.add("active");
