@@ -323,6 +323,12 @@
     </div>
 
     <script>
+        // Dữ liệu từ API và CORS proxy không đáng tin: phải thoát ký tự HTML trước khi chèn vào trang,
+        // nếu không một phản hồi chứa thẻ HTML sẽ chạy được mã trên trang này.
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+        }
+
         function checkIP() {
             let ip = document.getElementById("ipInput").value || "";
             
@@ -358,23 +364,23 @@
                     document.getElementById("loading").style.display = "none";
                     
                     if (data.status === "fail") {
-                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.message}</p>`;
+                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${escapeHtml(data.message)}</p>`;
                     } else {
                         document.getElementById("output").innerHTML = `
-                            <p><strong>🌍 Châu lục:</strong> ${data.continent || 'N/A'} (${data.continentCode || 'N/A'})</p>
-                            <p><strong>🏳 Quốc gia:</strong> ${data.country || 'N/A'} (${data.countryCode || 'N/A'})</p>
-                            <p><strong>📍 Vùng:</strong> ${data.regionName || 'N/A'} (${data.region || 'N/A'})</p>
-                            <p><strong>🏙 Thành phố:</strong> ${data.city || 'N/A'}</p>
-                            <p><strong>📮 Mã Zip:</strong> ${data.zip || 'N/A'}</p>
-                            <p><strong>📡 ISP:</strong> ${data.isp || 'N/A'}</p>
-                            <p><strong>🔗 Organization:</strong> ${data.org || 'N/A'}</p>
-                            <p><strong>🖥 AS:</strong> ${data.as || 'N/A'} (${data.asname || 'N/A'})</p>
-                            <p><strong>🔍 Reverse DNS:</strong> ${data.reverse || "Không có"}</p>
+                            <p><strong>🌍 Châu lục:</strong> ${escapeHtml(data.continent || 'N/A')} (${escapeHtml(data.continentCode || 'N/A')})</p>
+                            <p><strong>🏳 Quốc gia:</strong> ${escapeHtml(data.country || 'N/A')} (${escapeHtml(data.countryCode || 'N/A')})</p>
+                            <p><strong>📍 Vùng:</strong> ${escapeHtml(data.regionName || 'N/A')} (${escapeHtml(data.region || 'N/A')})</p>
+                            <p><strong>🏙 Thành phố:</strong> ${escapeHtml(data.city || 'N/A')}</p>
+                            <p><strong>📮 Mã Zip:</strong> ${escapeHtml(data.zip || 'N/A')}</p>
+                            <p><strong>📡 ISP:</strong> ${escapeHtml(data.isp || 'N/A')}</p>
+                            <p><strong>🔗 Organization:</strong> ${escapeHtml(data.org || 'N/A')}</p>
+                            <p><strong>🖥 AS:</strong> ${escapeHtml(data.as || 'N/A')} (${escapeHtml(data.asname || 'N/A')})</p>
+                            <p><strong>🔍 Reverse DNS:</strong> ${escapeHtml(data.reverse || "Không có")}</p>
                             <p><strong>🕵 Proxy:</strong> ${data.proxy ? "Có" : "Không"}</p>
                             <p><strong>🏢 Hosting:</strong> ${data.hosting ? "Có" : "Không"}</p>
                             <p><strong>📱 Di động:</strong> ${data.mobile ? "Có" : "Không"}</p>
-                            <p><strong>🕰 Timezone:</strong> ${data.timezone || 'N/A'} (UTC ${data.offset ? data.offset / 3600 : 'N/A'})</p>
-                            <p><strong>💰 Tiền tệ:</strong> ${data.currency || 'N/A'}</p>
+                            <p><strong>🕰 Timezone:</strong> ${escapeHtml(data.timezone || 'N/A')} (UTC ${escapeHtml(data.offset ? data.offset / 3600 : 'N/A')})</p>
+                            <p><strong>💰 Tiền tệ:</strong> ${escapeHtml(data.currency || 'N/A')}</p>
                         `;
                     }
                     document.getElementById("output").classList.add("active");
@@ -398,22 +404,22 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${data.reason || 'Không thể lấy thông tin IP'}</p>`;
+                        document.getElementById("output").innerHTML = `<p style="color: #ff3366;">Lỗi: ${escapeHtml(data.reason || 'Không thể lấy thông tin IP')}</p>`;
                     } else {
                         document.getElementById("output").innerHTML = `
-                            <p><strong>🌍 Châu lục:</strong> ${data.continent_code || 'N/A'}</p>
-                            <p><strong>🏳 Quốc gia:</strong> ${data.country_name || 'N/A'} (${data.country_code || 'N/A'})</p>
-                            <p><strong>📍 Vùng:</strong> ${data.region || 'N/A'}</p>
-                            <p><strong>🏙 Thành phố:</strong> ${data.city || 'N/A'}</p>
-                            <p><strong>📮 Mã Zip:</strong> ${data.postal || 'N/A'}</p>
-                            <p><strong>📡 ISP:</strong> ${data.org || 'N/A'}</p>
-                            <p><strong>🔗 ASN:</strong> ${data.asn || 'N/A'}</p>
-                            <p><strong>🕵 Latitude:</strong> ${data.latitude || 'N/A'}</p>
-                            <p><strong>🕵 Longitude:</strong> ${data.longitude || 'N/A'}</p>
-                            <p><strong>📱 IP:</strong> ${data.ip || 'N/A'}</p>
-                            <p><strong>🕰 Timezone:</strong> ${data.timezone || 'N/A'}</p>
-                            <p><strong>💰 Tiền tệ:</strong> ${data.currency || 'N/A'}</p>
-                            <p><strong>🔤 Languages:</strong> ${data.languages || 'N/A'}</p>
+                            <p><strong>🌍 Châu lục:</strong> ${escapeHtml(data.continent_code || 'N/A')}</p>
+                            <p><strong>🏳 Quốc gia:</strong> ${escapeHtml(data.country_name || 'N/A')} (${escapeHtml(data.country_code || 'N/A')})</p>
+                            <p><strong>📍 Vùng:</strong> ${escapeHtml(data.region || 'N/A')}</p>
+                            <p><strong>🏙 Thành phố:</strong> ${escapeHtml(data.city || 'N/A')}</p>
+                            <p><strong>📮 Mã Zip:</strong> ${escapeHtml(data.postal || 'N/A')}</p>
+                            <p><strong>📡 ISP:</strong> ${escapeHtml(data.org || 'N/A')}</p>
+                            <p><strong>🔗 ASN:</strong> ${escapeHtml(data.asn || 'N/A')}</p>
+                            <p><strong>🕵 Latitude:</strong> ${escapeHtml(data.latitude || 'N/A')}</p>
+                            <p><strong>🕵 Longitude:</strong> ${escapeHtml(data.longitude || 'N/A')}</p>
+                            <p><strong>📱 IP:</strong> ${escapeHtml(data.ip || 'N/A')}</p>
+                            <p><strong>🕰 Timezone:</strong> ${escapeHtml(data.timezone || 'N/A')}</p>
+                            <p><strong>💰 Tiền tệ:</strong> ${escapeHtml(data.currency || 'N/A')}</p>
+                            <p><strong>🔤 Languages:</strong> ${escapeHtml(data.languages || 'N/A')}</p>
                         `;
                     }
                     document.getElementById("output").classList.add("active");
